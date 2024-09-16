@@ -1,48 +1,70 @@
 # backupByRsync
 
 Language:       Bourne Shell  
-Version:        0.1
+Version:        0.2
 
 ## Function:       
-The shell script **backupByRsync.bash** performs a plain and simple data backup in a Linux environment with usage of *rsync* tool.  
-A configuration file is needed which contains information about the sources and base destination of the backup. An example of a configuration file is provided and named "backupConfig_example.bash".  
-If possible, the backup creates hard links from a previous destination directory instead of copying files from source tree.
-This can tremendously save memory space and also process time.
+The shell script **backupByRsync.bash** performs a plain and simple data backup in a Linux environment. The script uses internally the *rsync* tool.  
+A configuration file contains the names of sources and base destination of the backup. An example of a configuration file is provided and named "backupConfig_example.bash". 
+If possible, the backup creates hard links from a previous destination directory instead of copying files from source tree. This can tremendously save memory space and also process time of the backup.
+
+For more information about this script, call it with --help.
 
 ## Installation:   
 No installation is needed.
 1. Simply copy the script "backupByRsync.bash" into your favorite folder.
 2. Copy also the configuration file example "backupConfig_example.bash" into one of your accessible folders, e.g. in the same folder.
-3. Afterwards uncomment the entries SOURCE_LIST and DESTBASE of "backupConfig_example.bash" and fill it with your specific needs:  
+3. Afterwards uncomment the entries SOURCE_LIST and DESTBASE of "backupConfig_example.bash" by a text editor and fill it with your specific needs:  
    - your source folder names (this means, which directories should be backed up) and  
-   - your base destination folder name (this means, what is the destination of your backup).  
-4. This changed file can then be saved as "backupConfig.bash" in the same directory in which the script "backupByRsync.bash" exists. But you also can give the configuration file an other filename than "backupConfig.bash" and save it in an other directory.
-In this case, the configuration file's path and name has to be added as script parameter [config_file].  
-5. Make sure that the files are executable (run *chmod +x \<filename\>* if necessary)
+   - your base destination folder name (this means, what is the destination of your backup).
+4. When editing the file, consider strictly the syntax given by the example entries and also the limitations (see corresponding section below). 
+5. This changed file can then be saved as "backupConfig.bash" in the same directory in which the script "backupByRsync.bash" exists. But you can also give the configuration file an other filename and/or save it in an other directory.
+In this case, the configuration file's path and name has to be added as script argument *--config=FILE*.  
+6. Make sure that the files are executable (run *chmod +x \<filename\>* if necessary)
 
 ## Usage:          
-   ``./backupByRsync.bash [config_file] | -help``
+   ``./backupByRsync.bash --help | -h``
 
-The parameter [config_file] stands for the folder and file name of the configuration file.  
-If this parameter is omitted, then a config file named "backupConfig.bash" is expected in the script's directory.  
-Starting the script with parameter "-help" shows additional informations about configuration file, backup process and pre-requirement.
+   ``./backupByRsync.bash [--config=FILE] [--base=DIR]``
+
+   **Arguments (all optional):**
+   
+    --help, -h    : Help informations will be printed.
+    --config=FILE : FILE is the configuration file. 
+                    Default, if this argument is omitted: "backupConfig.bash" in the script's dir.
+    --base=DIR    : DIR is the directory which is used as base for creating hardlinks.
+                    Default, if this argument is omitted: The latest valid destination directory.
+  
+## Examples:
+- Use the default configuration file ./backupConfig.bash and look for latest destination directory to create hardlinks:
+
+  ``./backupByRsync``
+
+- Use the configuration file given by --config and look for latest destination directory to create hardlinks:
+
+  ``./backupByRsync --config=/home/myname/work/myconfig``
+
+- Use the configuration file given by --config and look for the destination directory given by --base to create hardlinks:
+
+  ``./backupByRsync --config=/home/myname/work/myconfig --base=/media/myData/2024-05-27-0934``
 
 ## Limitations:
+Following limitations regard the configuration file:
+
 Entries in SOURCE_LIST must not have spaces. This means that no spaces are allowed in name of uppermost directory of a source tree.  
 Entry   in DESTBASE    must not have spaces. This means that no spaces are allowed in name of uppermost directory of destination tree.
 
 ## Backup Process:
-For each run of this script, a new destination directory is automatically created in base destination directory (DESTBASE).  
+For each run of this script, a new destination directory is created in base destination directory.  
 The destination directories are named according date and time of creation:  
 "\<YYYY\>-\<MM\>-\<DD\>-\<HH\>\<MM\>"  
-A log file named "log_\<YYYY\>-\<MM\>-\<DD\>-\<HH\>\<MM\>.log" is saved in the destination directory.  
-The backup process is internally performed by *rsync* tool. The name of last valid destination directory is handed over to *rsync*. In doing so, hard links are created from last destination directory instead of a copy from source directory tree, whenever possible.  
-The destination directory name is expanded by "-CORRUPT" if the backup process failed.
-New runs do not use corrupt destination directories as basis of hard link creations but try to use a possible last valid destination folder.
+A log file named "log_\<YYYY\>-\<MM\>-\<DD\>-\<HH\>\<MM\>.log" is saved in the corresponding destination directory.  
+The backup process is internally performed by *rsync* tool. Whenever possible, hard links are created from an existing destination directory instead of copying files from source directory tree. By default, the latest existing destination directory is used as base for creating those hard links. But the optional argument [--base=DIR] allows the user to select an other directory as base for hard link creation.
+The destination directory name is expanded by "-CORRUPT" if the backup process ended with an error. By default, new runs do not use corrupt destination directories as basis of hard link creations but try to use the previous one.
  
 ## Pre-Requirement:
 The *rsync* tool has to be installed before using this script.  
-For successfully tests of this script, *rsync* version 3.2.7 was used by the author.
+For successful tests of this script, *rsync* version 3.2.7 was used by the author.
 
 
 ## License / Disclaimer:
@@ -63,4 +85,4 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 Thanks a lot to the authors of the brilliant *rsync* tool.  
 The *rsync* tool is the absolute heart of this software.  
-**Please refer to the *rsync* manpage for its license information.**
+Please refer to the *rsync* manpage for its license information.
